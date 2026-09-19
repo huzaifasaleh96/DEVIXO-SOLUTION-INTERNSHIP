@@ -1,0 +1,57 @@
+Task 2 — Healthcare Patient Data Preprocessing
+Overview
+This notebook (`devixo_task_2_huz.ipynb`) takes a raw healthcare patient dataset and runs it through a full data cleaning and preprocessing pipeline: missing-value imputation, duplicate removal, outlier handling, type conversion, categorical encoding, feature scaling, and feature engineering — finishing with an equivalent automated `scikit-learn` pipeline as a bonus.
+Dataset
+File: `healthcare_patient_dataset_clean_2000_records.csv`
+Records: 2,000 patients
+Columns: 15
+`Patient_ID`, `Age`, `Gender`, `Blood_Type`, `City`, `Department`
+`Admission_Date`, `Diagnosis`, `Treatment`, `Medication`
+`Stay_Days`, `Medical_Cost`, `Insurance`, `Satisfaction_Score`, `Order_Status`
+Environment / Requirements
+Google Colab (uses `google.colab.drive` to mount the dataset from Google Drive)
+Python 3
+`pandas`, `numpy`, `matplotlib`, `seaborn`, `scikit-learn`
+To run outside Colab, replace the `drive.mount(...)` cell and the `dataset_path` variable with a local file path.
+Workflow / Notebook Structure
+Load & inspect — mount Drive, load CSV, check `shape` (2000×15) and `columns`.
+Missing values
+Detected: `Age` (12), `City` (10), `Medication` (294), `Medical_Cost` (10), `Satisfaction_Score` (8).
+Visualized with a bar chart before handling.
+Imputed: numeric columns (`Age`, `Medical_Cost`, `Satisfaction_Score`) with median; categorical columns (`City`, `Medication`) with mode.
+Re-checked and visualized: 0 missing values after handling.
+Duplicates — checked and removed (0 found; shape unchanged at 2000×15).
+Outlier detection & treatment
+IQR method applied to all numeric columns.
+`Stay_Days`: 4 outliers capped; `Medical_Cost`: 4 outliers capped; `Age` and `Satisfaction_Score`: no outliers.
+Before/after box plots for `Stay_Days` and `Medical_Cost`.
+Data type conversion — `Admission_Date` converted from `object` to `datetime64[ns]`.
+Categorical encoding — One-hot encoding (`pd.get_dummies`, `drop_first=True`) applied to 9 categorical columns (`Gender`, `Blood_Type`, `City`, `Department`, `Diagnosis`, `Treatment`, `Medication`, `Insurance`, `Order_Status`), expanding the dataset from 15 to 46 columns.
+Standardization — `StandardScaler` applied to `Age`, `Stay_Days`, `Medical_Cost`, `Satisfaction_Score` (mean ≈ 0, std ≈ 1 after scaling). Distributions visualized before/after.
+Feature engineering — two new features derived from `Admission_Date`:
+`Day_of_Week`
+`Month`
+(Three additional planned features — sales revenue, profit per unit, sales-per-rating — were not applicable to this dataset, since it has no unit price/quantity/rating columns; this is noted explicitly in the notebook.) Final shape: 2000 × 48.
+Descriptive statistics before vs. after preprocessing — full `.describe()` comparison table.
+Written explanation of all 7 preprocessing steps (missing values, duplicates, outliers, data types, encoding, standardization, feature engineering) with rationale for each.
+Bonus: automated `scikit-learn` pipeline — a `ColumnTransformer` combining:
+Numeric pipeline: `SimpleImputer(strategy='median')` → `StandardScaler`
+Categorical pipeline: `SimpleImputer(strategy='most_frequent')` → `OneHotEncoder(drop='first', handle_unknown='ignore')`
+Applied to 6 numeric + 9 categorical features → output shape (2000, 46), plus a small bar chart summarizing the 4 pipeline stages.
+Key Results
+Step	Before	After
+Missing values	334 total across 5 columns	0
+Duplicate rows	0	0
+Outliers (Stay_Days, Medical_Cost)	4 + 4	capped to IQR bounds
+Columns	15	48 (after encoding + feature engineering)
+Age / Stay_Days / Medical_Cost / Satisfaction_Score scale	raw units	standardized (mean 0, std 1)
+How to Reproduce
+Open the notebook in Google Colab (or Jupyter).
+Update `dataset_path` to point to your copy of `healthcare_patient_dataset_clean_2000_records.csv`.
+Run all cells top to bottom (manual pipeline first, automated `sklearn` pipeline in the bonus section at the end).
+Output
+Cleaned, encoded, and scaled DataFrame (`df_encoded`), ready for modeling.
+Before/after visualizations for missing values and outliers.
+A fitted `scikit-learn` `ColumnTransformer` producing a model-ready NumPy array (`X_processed`, shape 2000×46).
+A written summary of all preprocessing decisions and their justification.
+See `Task2_Report.md` for a full narrative write-up of this pipeline and its findings.
